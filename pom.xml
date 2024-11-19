@@ -16,7 +16,7 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>coinbase-advanced-sdk-java</artifactId>
+  <artifactId>coinbase-advanced-sdk-java-temp</artifactId>
   <groupId>com.coinbase.advanced</groupId>
   <name>Coinbase Advanced Trade Java SDK</name>
   <description>Sample Java SDK for the Coinbase International Exchange REST APIs</description>
@@ -207,7 +207,16 @@
       <artifactId>nimbus-jose-jwt</artifactId>
       <version>9.23</version>
     </dependency>
-
+    <dependency>
+      <groupId>io.github.cdimascio</groupId>
+      <artifactId>java-dotenv</artifactId>
+      <version>5.2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.coinbase.core</groupId>
+      <artifactId>coinbase-core-java</artifactId>
+      <version>1.0.0</version>
+    </dependency>
 
 
 

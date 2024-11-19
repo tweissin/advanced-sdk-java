@@ -12,20 +12,23 @@ import com.coinbase.advanced.model.portfolios.ListPortfoliosResponse;
 import com.coinbase.advanced.orders.OrdersService;
 import com.coinbase.advanced.portfolios.PortfoliosService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {
         try {
-            String credsStringBlob = System.getenv("ADVANCED_TRADE_CREDENTIALS");
-            if (credsStringBlob == null) {
-                throw new RuntimeException("ADVANCED_TRADE_CREDENTIALS environment variable is not set");
-            }
+            Dotenv dotenv = Dotenv.configure()
+                    .directory(System.getProperty("user.home"))
+                    .filename(".bcenv")
+                    .load();
+            String privateKeyPEM = dotenv.get("COINBASE_PRIVATE_KEY").replace("\\n", "\n");
+            String name = dotenv.get("COINBASE_API_KEY_NAME");
 
             ObjectMapper mapper = new ObjectMapper();
 
-            CoinbaseAdvancedCredentials credentials = new CoinbaseAdvancedCredentials(credsStringBlob);
+            CoinbaseAdvancedCredentials credentials = new CoinbaseAdvancedCredentials(name, privateKeyPEM);
             CoinbaseAdvancedClient client = new CoinbaseAdvancedClient(credentials);
             PortfoliosService portfolioService = CoinbaseAdvancedServiceFactory.createPortfoliosService(client);
 
@@ -39,25 +42,27 @@ public class Main {
 
             OrdersService ordersService = CoinbaseAdvancedServiceFactory.createOrdersService(client);
 
-            CreateOrderRequest createOrderRequest = new CreateOrderRequest.Builder()
-                    .clientOrderId(UUID.randomUUID().toString())
-                    .productId("ADA-USD")
-                    .retailPortfolioId(listResponse.getPortfolios().get(0).getUuid())
-                    .side("BUY")
-                    .orderConfiguration(
-                            new OrderConfiguration.Builder()
-                                    .marketMarketIoc(
-                                            new MarketIoc.Builder()
-                                                    .baseSize("1")
-                                                    .build())
-                                    .build()
-                    )
-                    .build();
-            CreateOrderResponse createOrderResponse = ordersService.createOrder(createOrderRequest);
+            if (false) {
+                CreateOrderRequest createOrderRequest = new CreateOrderRequest.Builder()
+                        .clientOrderId(UUID.randomUUID().toString())
+                        .productId("ADA-USD")
+                        .retailPortfolioId(listResponse.getPortfolios().get(0).getUuid())
+                        .side("BUY")
+                        .orderConfiguration(
+                                new OrderConfiguration.Builder()
+                                        .marketMarketIoc(
+                                                new MarketIoc.Builder()
+                                                        .baseSize("1")
+                                                        .build())
+                                        .build()
+                        )
+                        .build();
+                CreateOrderResponse createOrderResponse = ordersService.createOrder(createOrderRequest);
 
-            prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(createOrderResponse);
-            System.out.println("Create Order Response");
-            System.out.println(prettyJson);
+                prettyJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(createOrderResponse);
+                System.out.println("Create Order Response");
+                System.out.println(prettyJson);
+            }
 
         } catch (Throwable e) {
             throw new RuntimeException("Failed to retrieve the list portfolios response", e);
